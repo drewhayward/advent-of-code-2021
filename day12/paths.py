@@ -1,19 +1,5 @@
 from collections import defaultdict, Counter
 
-class History(Counter):
-    def __init__(self, max_repeats=2):
-        super().__init__()
-        self.max_repeats = max_repeats
-        self.repeated_node = None
-
-    def __setitem__(self, k, v) -> None:
-        super().__setitem__(k, v)
-        if v == self.max_repeats:
-            self.repeated_node = k
-        elif k == self.repeated_node:
-            self.repeated_node = None
-        return v
-
 def count_paths(adj):
     
     # Counts the number of ways to the 'end' node from the 'node' given the 
@@ -32,32 +18,31 @@ def count_paths(adj):
             total += _count(neighbor, history)
         history.pop()
         return total
-    res = _count('start', [])
-    return res
+    return _count('start', [])
 
 def count_paths2(adj):
     # Counts the number of ways to the 'end' node from the 'node' given the 
     # history
-    def _count(node, history, stack): 
+    def _count(node, history=[], repeat=False): 
         if node == 'end':
             return 1
 
         total = 0
-        if node.islower() and node != 'start':
-            history[node] += 1
+        history.append(node)
         for neighbor in adj[node]:
             if neighbor == 'start': continue
-            # Not allowed to revisit lowercase nodes
-            if neighbor.islower() and neighbor in history and history.repeated_node is not None:
-                continue 
             
-            total += _count(neighbor, history, stack)
-        if node.islower() and node != 'start':
-            history[node] -= 1 
-            if history[node] <= 0:
-                del history[node]
+            if neighbor.islower():
+                c = history.count(neighbor)
+                if c == 1 and not repeat:
+                    total += _count(neighbor, history, True)
+                elif c == 0:
+                    total += _count(neighbor, history, repeat)
+            else:
+                total += _count(neighbor, history, repeat)
+        history.pop()
         return total
-    res = _count('start', History(), [])
+    res = _count('start')
     return res
 
 def parse_input(contents):
