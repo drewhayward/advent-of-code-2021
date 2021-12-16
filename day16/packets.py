@@ -87,20 +87,12 @@ def read_packet(data):
                 assert len(sub_packets) == 2, 'Must have exactly 2 subpackets'
         return res, data, TOTAL - len(data)
 
-def parse_message(data):
-    total = 0
-    while len(data) > 8 and int(data) != 0:
-        version_sum, data, _ = read_packet(data)
-        total += version_sum
-
-    return total
-
 if __name__ == "__main__":
     data = convert_input('9C0141080250320F1802104A08')
-    print(parse_message(data))
+    print(read_packet(data)[0])
     
     with open('day16/input.txt') as f:
         data = convert_input(f.read().strip())
 
-    print(parse_message(data))
+    print(read_packet(data)[0])
     
