@@ -1,5 +1,5 @@
 import math
-from pprint import pprint
+import json
 from copy import deepcopy
 
 class Node:
@@ -128,25 +128,8 @@ class Node:
     def __str__(self) -> str:
         if not self.children:
             return str(self.n)
-            return f"({str(self.n)},{self.depth})"
         else:
             return f'[{str(self.children[0])},{str(self.children[1])}]'
-
-def smart_split(snum):
-    stack = 0
-    for i, c in enumerate(snum):
-        if c == '[':
-            stack += 1
-        elif c == ']':
-            stack -= 1
-        elif c == ',' and stack == 0:
-            break
-    return snum[:i], snum[i + 1:]
-
-def parse_num(snum: str):
-    if len(snum) == 1:
-        return int(snum)
-    return [parse_num(n) for n in smart_split(snum[1:-1])]
         
 def part_1(nums):
     num = nums[0]
@@ -165,14 +148,14 @@ def part_2(nums):
 
 if __name__ == "__main__":
     with open('day18/test.txt') as f:
-        nums = list(map(parse_num, f.read().splitlines()))
+        nums = list(map(json.loads, f.read().splitlines()))
         nums = list(map(Node, nums))
 
     print(part_1(nums))
 
     print('--- Part 1 ---')
     with open('day18/input.txt') as f:
-        nums = list(map(parse_num, f.read().splitlines()))
+        nums = list(map(json.loads, f.read().splitlines()))
         nums = list(map(Node, nums))
     
     print(part_1(nums))
