@@ -16,14 +16,7 @@ def play_deterministic(p0, p1):
 
     return rolls * min(scores)
 
-def unfinished_games(tab):
-    unfinished_games = 0
-    for pos in range(10 + 1):
-        for score in range(21 + 1):
-            unfinished_games += tab[(pos, score)]
-    return unfinished_games
-
-def play_quantum(p0, p1):
+def play_quantum(p0, p1, target=21):
     roll_dist = [(3,1), (4,3), (5,6), (6,7), (7,6), (8,3), (9,1)]
     # Keep track of the number of worlds for each (pos, score) pair
     # (pos, score)
@@ -31,6 +24,13 @@ def play_quantum(p0, p1):
     tabs[0][(p0, 0)] = 1
     tabs[1][(p1, 0)] = 1
     wins = [0,0]
+
+    def unfinished_games(tab):
+        unfinished_games = 0
+        for pos in range(10 + 1):
+            for score in range(target + 1):
+                unfinished_games += tab[(pos, score)]
+        return unfinished_games
 
     turn = 0
     while unfinished_games(tabs[0]) != 0 and unfinished_games(tabs[1]) != 0:
@@ -42,15 +42,15 @@ def play_quantum(p0, p1):
 
                 for roll, times in roll_dist:
                     newpos = ((pos + roll - 1 ) % 10) + 1
-                    newscore = min(score + newpos, 21)
+                    newscore = min(score + newpos, target)
                     newtab[(newpos, newscore)] += worlds * times
 
         # add wins and remove those winning games
         for pos in range(10 + 1):
             # Each winning score could beat ANY of the unfinished games
             # for the opponent
-            wins[turn] += newtab[(pos, 21)] * unfinished_games(tabs[opponent])
-            del newtab[(pos, 21)]
+            wins[turn] += newtab[(pos, target)] * unfinished_games(tabs[opponent])
+            del newtab[(pos, target)]
 
         tabs[turn] = newtab
         turn = opponent
@@ -65,4 +65,4 @@ if __name__ == "__main__":
     print('--- Part 1 ---')
     print(play_deterministic(8,7))
     print('--- Part 2 ---')
-    print(play_quantum(8,7))
+    print(play_quantum(8,7, target=21))
